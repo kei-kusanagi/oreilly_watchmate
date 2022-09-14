@@ -189,6 +189,9 @@ esto se pone en el archivo fly.toml
 pero me daba un error, referente a los static y collectstatics, entonces buscando en stack
 https://stackoverflow.com/questions/36760549/python-django-youre-using-the-staticfiles-app-without-having-set-the-static-ro
 
+tambien en allowed host le puse ``['*']``
+
+
 configure eso en settings.py y listooooooo deployed successfuly
 
 ![[Pasted image 20220914150502.png]]
