@@ -127,3 +127,68 @@ connection to server at "localhost" (127.0.0.1), port 5433 failed: Connection re
         Is the server running on that host and accepting TCP/IP connections?
 ```
 
+ok, después de mucho averiguar y gracias a la guia de Lecks que casid e inmediato encontró el error, creo avanzamos, pero sigue sin subirse la api, el problema estaba en el procfile, el cual un error decía que no reconocía el comando gunicorn, entonces procedí en instalarlo con un pip install, luego lo configure para que inicie la app que estamos subiendo
+
+```
+# Modify this Procfile to fit your needs
+
+web: gunicorn watchmate.wsgi
+```
+
+ahora el problema esta en la base de datos
+
+```
+Recent Logs
+2022-09-14T17:50:30.000 [info]     from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_pip-install/packages/lib/python3.10/site-packages/django/contrib/auth/base_user.py", line 49, in <module>
+2022-09-14T17:50:30.000 [info]     class AbstractBaseUser(models.Model):
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_pip-install/packages/lib/python3.10/site-packages/django/db/models/base.py", line 141, in __new__
+2022-09-14T17:50:30.000 [info]     new_class.add_to_class("_meta", Options(meta, app_label))     
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_pip-install/packages/lib/python3.10/site-packages/django/db/models/base.py", line 369, in add_to_class
+2022-09-14T17:50:30.000 [info]     value.contribute_to_class(cls, name)
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_pip-install/packages/lib/python3.10/site-packages/django/db/models/options.py", line 231, in contribute_to_class
+2022-09-14T17:50:30.000 [info]     self.db_table, connection.ops.max_name_length()
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_pip-install/packages/lib/python3.10/site-packages/django/utils/connection.py", line 15, in __getattr__
+2022-09-14T17:50:30.000 [info]     return getattr(self._connections[self._alias], item)
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_pip-install/packages/lib/python3.10/site-packages/django/utils/connection.py", line 62, in __getitem__
+2022-09-14T17:50:30.000 [info]     conn = self.create_connection(alias)
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_pip-install/packages/lib/python3.10/site-packages/django/db/utils.py", line 193, in create_connection
+2022-09-14T17:50:30.000 [info]     backend = load_backend(db["ENGINE"])
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_pip-install/packages/lib/python3.10/site-packages/django/db/utils.py", line 113, in load_backend
+2022-09-14T17:50:30.000 [info]     return import_module("%s.base" % backend_name)
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_cpython/cpython/lib/python3.10/importlib/__init__.py", line 126, in import_module
+2022-09-14T17:50:30.000 [info]     return _bootstrap._gcd_import(name[level:], package, level)   
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_pip-install/packages/lib/python3.10/site-packages/django/db/backends/sqlite3/base.py", line 7, in <module>
+2022-09-14T17:50:30.000 [info]     from sqlite3 import dbapi2 as Database
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_cpython/cpython/lib/python3.10/sqlite3/__init__.py", line 57, in <module>
+2022-09-14T17:50:30.000 [info]     from sqlite3.dbapi2 import *
+2022-09-14T17:50:30.000 [info]   File "/layers/paketo-buildpacks_cpython/cpython/lib/python3.10/sqlite3/dbapi2.py", line 27, in <module>
+2022-09-14T17:50:30.000 [info]     from _sqlite3 import *
+2022-09-14T17:50:30.000 [info] ImportError: libsqlite3.so.0: cannot open shared object file: No such file or directory
+2022-09-14T17:50:30.000 [info] [2022-09-14 17:50:30 +0000] [533] [INFO] Worker exiting (pid: 533)2022-09-14T17:50:30.000 [info] [2022-09-14 17:50:30 +0000] [515] [INFO] Shutting down: Master    
+2022-09-14T17:50:30.000 [info] [2022-09-14 17:50:30 +0000] [515] [INFO] Reason: Worker failed to 
+boot.
+2022-09-14T17:50:31.000 [info] Starting clean up.
+***v6 failed - Failed due to unhealthy allocations - no stable job version to auto revert to and 
+deploying as v7
+
+Troubleshooting guide at https://fly.io/docs/getting-started/troubleshooting/
+Error abort
+```
+
+después de muchos intentos, subi una app sensilla, un simple main.py diciendo hola desde fly.io y quedo
+
+lo que hice diferente fue usar otro buildpack, en un tutorial explicaban que era mejor usar el de heroku
+
+``builder = "heroku/buildpacks:latest"`` 
+
+esto se pone en el archivo fly.toml
+
+![[Pasted image 20220914150339.png]]
+
+pero me daba un error, referente a los static y collectstatics, entonces buscando en stack
+https://stackoverflow.com/questions/36760549/python-django-youre-using-the-staticfiles-app-without-having-set-the-static-ro
+
+configure eso en settings.py y listooooooo deployed successfuly
+
+![[Pasted image 20220914150502.png]]
