@@ -195,3 +195,6 @@ tambien en allowed host le puse ``['*']``
 configure eso en settings.py y listooooooo deployed successfuly
 
 ![[Pasted image 20220914150502.png]]
+
+
+https://youtu.be/5_hLC1QC_Vc?t=741
